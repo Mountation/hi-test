@@ -38,6 +38,7 @@ def process_dataset_async(run_id, evaluation_set_id, api_key):
     }
     set_processing_status(run_id, status_data)
     
+    logger.info('Starting process_dataset_async run_id=%s evaluation_set_id=%s', run_id, evaluation_set_id)
     try:
         # 获取评测集和语料
         evaluation_set = EvaluationSet.objects.get(id=evaluation_set_id)
@@ -63,8 +64,9 @@ def process_dataset_async(run_id, evaluation_set_id, api_key):
         try:
             agent_info = ai_client.get_agent_info()
             version = agent_info.get('name', '1.0')  # 如果没有name字段，使用默认值
+            logger.info('AI agent info for run_id=%s: %s', run_id, agent_info)
         except Exception as e:
-            logger.error(f"获取AI模型信息失败: {e}")
+            logger.exception('Failed to get AI agent info for run_id=%s: %s', run_id, e)
             version = '1.0'  # 默认版本
             
         ai_eval = AIEval()
@@ -130,6 +132,7 @@ def process_dataset_async(run_id, evaluation_set_id, api_key):
                     version=version,  # 使用从API获取的版本
                     execution_order=i+1
                 )
+                logger.exception('Error processing corpus id=%s run_id=%s: %s', getattr(corpus, 'id', None), run_id, e)
                 # 不再抛出异常，继续处理下一条语料
                 continue
         
@@ -150,6 +153,7 @@ def process_dataset_async(run_id, evaluation_set_id, api_key):
             'data': excel_data,
             'end_time': timezone.now().strftime('%Y-%m-%d %H:%M:%S')
         })
+        logger.info('Completed process_dataset_async run_id=%s processed=%d', run_id, len(excel_data))
         set_processing_status(run_id, status_data)
         
         # 任务完成后，设置一个较短的过期时间
@@ -170,6 +174,7 @@ def process_dataset_async(run_id, evaluation_set_id, api_key):
             'error': str(e),
             'end_time': timezone.now().strftime('%Y-%m-%d %H:%M:%S')
         })
+        logger.exception('process_dataset_async failed run_id=%s: %s', run_id, e)
         set_processing_status(run_id, status_data)
         
         # 失败任务也设置较短的过期时间

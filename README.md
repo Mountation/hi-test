@@ -186,3 +186,52 @@ gunicorn CaseAI.wsgi:application --bind 0.0.0.0:8000 --workers 3
     - 若在 Windows 上部署生产服务，建议使用 `Waitress`（生产 WSGI）或容器化（Docker）将应用封装到 Linux 容器中以获得一致性和更好的性能。
 
 示例 Nginx + Gunicorn、Postgres、Whitenoise 的流程可以根据你的服务器环境定制，需要的话我可以为你写出具体的 Nginx 配置与 Systemd service 文件。
+
+## 日志与性能监控
+
+项目已经集成基于 Python/Django 的 logging 配置，支持控制台输出与按时间轮转日志文件（每日轮转，保留 7 天）。同时在关键长任务（导入、评测）中添加了性能监控日志，记录批次插入耗时、任务总耗时、每秒处理速率等指标。
+
+主要配置项（环境变量）
+- `LOG_LEVEL`：日志级别（DEBUG, INFO, WARNING, ERROR）。默认 `INFO`。
+- `LOG_FILE`：日志文件路径。默认 `./caseai.log`（项目根目录）。
+
+性能指标（日志中会记录）
+- 导入（create_dataset）：
+   - 导入开始/结束时间
+   - 总耗时（秒）和 rows/sec
+   - 每个批次（bulk_create）耗时数组（batch durations），并统计 min/max/mean/batches
+- 评测（process_dataset_async）：
+   - 任务开始/结束时间、处理计数
+   - AI agent 信息获取日志
+   - 每条语料处理中的异常与其堆栈
+
+如何启用（示例，PowerShell）
+```powershell
+$env:LOG_LEVEL='DEBUG'
+$env:LOG_FILE='D:\logs\caseai.log'
+python manage.py runserver
+```
+
+查看日志
+- 控制台：运行 `runserver` 或 Gunicorn 时即可看到控制台日志。
+- 文件：查看 `LOG_FILE` 指定的文件，日志会按日轮转并保留 7 天备份；旧文件名会包含日期后缀。
+
+将性能指标导出到监控系统
+- 当前实现将统计通过日志记录。如果需要将这些指标导入 Prometheus/StatsD/Influx/ELK，我可以：
+   - 在代码中同时发送度量到 StatsD（例如 `datadog`/`statsd` lib），或
+   - 将关键统计写入数据库并提供 API 端点以便监控系统抓取，或
+   - 将日志推送到集中式日志系统（ELK/EFK）并在 Kibana/Elastic 中建立面板。
+
+如需我帮你将指标导出到具体的监控系统（Prometheus/StatsD/ELK 等），告诉我你的目标系统，我会提供实现方案与样例代码。
+
+## 代码结构重构说明
+
+为减少重复代码并集中处理 Excel 解析与批量插入逻辑，我已新增：
+
+- `myapp/utils.py`：包含 `parse_excel_file`（流式解析 Excel 并返回行生成器）和 `bulk_create_corpora`（按批批量插入 Corpus 并返回插入统计）的工具函数。
+
+优势：
+- 去重了 `create_dataset` 中重复的解析与批量插入逻辑。
+- 集中记录批次插入耗时统计，便于后续拓展（例如把统计发送到监控或持久化）。
+
+如果你想我可以继续把更多重复的逻辑（例如日志、错误处理、进度存储）抽离到共享模块或在 `myapp/services/` 下创建服务类以便单元测试和复用。

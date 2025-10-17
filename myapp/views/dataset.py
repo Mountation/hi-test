@@ -4,9 +4,14 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from ..models import EvaluationSet, Corpus
-import openpyxl
+from ..utils import parse_excel_file, bulk_create_corpora
+import time
 from collections import Counter
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+import logging
+
+# Logger for this module
+logger = logging.getLogger(__name__)
 
 def list_datasets(request):
     """
@@ -48,19 +53,10 @@ def create_dataset(request):
             'message': f'评测集名称 "{evaluation_set_name}" 已存在，请使用其他名称'
         })
     
+    logger.info('create_dataset called by %s', request.META.get('REMOTE_ADDR'))
     try:
-        # 使用 openpyxl 的只读模式按行流式读取，避免一次性把整个文件载入内存
-        workbook = openpyxl.load_workbook(excel_file, read_only=True, data_only=True)
-        sheet = workbook.active
-
-        # 检查Excel格式（只检查第一行是否至少有一列）
-        first_row = next(sheet.iter_rows(min_row=1, max_row=1, values_only=True), None)
-        if not first_row or len(first_row) < 1:
-            workbook.close()
-            return JsonResponse({
-                'status': 'error',
-                'message': 'Excel文件格式不正确，至少需要一列数据'
-            })
+        # 解析 Excel 文件（返回 header 与行生成器）
+        headers, rows_gen = parse_excel_file(excel_file)
 
         # 创建评测集
         evaluation_set = EvaluationSet.objects.create(
@@ -69,46 +65,15 @@ def create_dataset(request):
             status='active'
         )
 
-        # 按批次构建 Corpus 实例并使用 bulk_create 提交，显著减少数据库交互次数
-        batch_size = 1000
-        objs = []
-        success_count = 0
+        # 使用工具函数做批量插入并收集统计
+        stats = bulk_create_corpora(evaluation_set, rows_gen, batch_size=1000, logger_obj=logger)
 
-        # 使用事务包裹批量插入，保证一致性并提升性能
-        with transaction.atomic():
-            for row in sheet.iter_rows(min_row=2, values_only=True):
-                if row and row[0]:
-                    content = str(row[0])
-                    expected_response = str(row[1]) if len(row) > 1 and row[1] is not None else None
-                    intent = str(row[2]) if len(row) > 2 and row[2] is not None else None
-
-                    objs.append(Corpus(
-                        evaluation_set=evaluation_set,
-                        content=content,
-                        expected_response=expected_response,
-                        intent=intent
-                    ))
-
-                    # 达到批次大小时写入数据库
-                    if len(objs) >= batch_size:
-                        Corpus.objects.bulk_create(objs, batch_size=batch_size)
-                        success_count += len(objs)
-                        objs = []
-
-            # 插入剩余未满一批的数据
-            if objs:
-                Corpus.objects.bulk_create(objs, batch_size=batch_size)
-                success_count += len(objs)
-
-        # 关闭只读工作簿释放文件句柄
-        workbook.close()
-        
         return JsonResponse({
             'status': 'success',
-            'message': f'成功创建评测集 "{evaluation_set_name}"，导入了 {success_count} 条语料记录'
+            'message': f'成功创建评测集 "{evaluation_set_name}"，导入了 {stats["success_count"]} 条语料记录'
         })
-        
     except Exception as e:
+        logger.exception('Failed to create EvaluationSet "%s": %s', evaluation_set_name if 'evaluation_set_name' in locals() else '<unknown>', e)
         return JsonResponse({
             'status': 'error',
             'message': f'上传文件失败: {str(e)}'
@@ -127,6 +92,7 @@ def delete_dataset(request, dataset_id):
     # 获取评测集对象
     evaluation_set = get_object_or_404(EvaluationSet, id=dataset_id)
 
+    logger.info('delete_dataset called for id=%s by %s', dataset_id, request.META.get('REMOTE_ADDR'))
     try:
         # 获取关联的语料数量，用户返回信息（在删除前统计）
         corpus_qs = Corpus.objects.filter(evaluation_set=evaluation_set)
@@ -138,16 +104,19 @@ def delete_dataset(request, dataset_id):
         # 然后删除评测集本身
         with transaction.atomic():
             if corpus_count > 0:
-                corpus_qs.delete()
+                deleted_info = corpus_qs.delete()
+                logger.info('Deleted corpora for EvaluationSet id=%s: %s', evaluation_set.id, deleted_info)
 
             # 删除评测集（单条删除，开销很小）
             EvaluationSet.objects.filter(id=evaluation_set.id).delete()
+            logger.info('Deleted EvaluationSet id=%s name="%s"', evaluation_set.id, evaluation_set_name)
 
         return JsonResponse({
             'status': 'success',
             'message': f'成功删除评测集 "{evaluation_set_name}"，删除了 {corpus_count} 条语料记录'
         })
     except Exception as e:
+        logger.exception('Failed to delete EvaluationSet id=%s: %s', dataset_id, e)
         return JsonResponse({
             'status': 'error',
             'message': f'删除评测集失败: {str(e)}'
@@ -174,6 +143,7 @@ def view_dataset(request, dataset_id):
         page_obj = paginator.page(paginator.num_pages)
 
     corpora_count = corpora_qs.count()
+    logger.debug('view_dataset id=%s page=%s total_corpora=%d', dataset_id, page, corpora_count)
 
     context = {
         'evaluation_set': evaluation_set,

@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import socket
+import os
+import logging
+import logging.config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -158,3 +161,55 @@ CACHES = {
 
 # CORS settings - during development allow frontend dev server
 CORS_ALLOW_ALL_ORIGINS = True
+
+# Logging configuration (configurable via environment variables)
+# Set LOG_LEVEL (DEBUG/INFO/WARNING/ERROR) and optional LOG_FILE path
+LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO').upper()
+LOG_FILE = os.environ.get('LOG_FILE', str(BASE_DIR / 'caseai.log'))
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '[%(asctime)s] %(levelname)s %(name)s: %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard',
+            'level': LOG_LEVEL,
+        },
+        'file': {
+            # Rotate logs every midnight and keep backups for a week
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'formatter': 'standard',
+            'level': LOG_LEVEL,
+            'filename': LOG_FILE,
+            'when': 'midnight',
+            'interval': 1,
+            'backupCount': 7,
+            'encoding': 'utf-8',
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': LOG_LEVEL,
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': LOG_LEVEL,
+            'propagate': False,
+        },
+        'myapp': {
+            'handlers': ['console', 'file'],
+            'level': LOG_LEVEL,
+            'propagate': False,
+        },
+    }
+}
+
+# Apply logging configuration
+logging.config.dictConfig(LOGGING)

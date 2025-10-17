@@ -1,0 +1,98 @@
+[2025-10-17 11:37:03,778] INFO myapp: Test log from environment
+[2025-10-17 13:22:50,714] INFO django.utils.autoreload: Watching for file changes with StatReloader
+[2025-10-17 13:22:55,251] INFO django.server: "GET / HTTP/1.1" 200 25136
+[2025-10-17 13:22:55,252] INFO django.server: "GET / HTTP/1.1" 200 3991
+[2025-10-17 13:22:58,418] INFO django.server: "GET /datasets/run/ HTTP/1.1" 200 8118
+[2025-10-17 13:22:58,430] INFO django.server: "GET /datasets/run/ HTTP/1.1" 200 40262
+[2025-10-17 13:23:02,823] INFO django.server: "GET /datasets/create/ HTTP/1.1" 200 22537
+[2025-10-17 13:23:02,824] INFO django.server: "GET /datasets/create/ HTTP/1.1" 200 5607
+[2025-10-17 13:23:16,475] INFO myapp.views.dataset: Starting dataset import: name=demo234, desc=
+[2025-10-17 13:23:17,032] INFO myapp.views.dataset: Finished dataset import: name=demo234, inserted=844
+[2025-10-17 13:23:17,053] INFO django.server: "POST /datasets/create/ HTTP/1.1" 200 149
+[2025-10-17 13:23:20,122] INFO django.server: "GET /datasets/ HTTP/1.1" 200 4983
+[2025-10-17 13:23:20,126] INFO django.server: "GET /datasets/ HTTP/1.1" 200 23897
+[2025-10-17 13:27:16,764] INFO django.utils.autoreload: D:\JHKdoc\CaseAI\myapp\views\dataset.py changed, reloading.
+[2025-10-17 13:27:20,025] INFO django.utils.autoreload: Watching for file changes with StatReloader
+[2025-10-17 13:47:08,388] INFO django.utils.autoreload: D:\JHKdoc\CaseAI\CaseAI\settings.py changed, reloading.
+[2025-10-17 13:47:14,136] INFO django.utils.autoreload: Watching for file changes with StatReloader
+[2025-10-17 13:47:27,407] INFO django.utils.autoreload: D:\JHKdoc\CaseAI\myapp\views\dataset.py changed, reloading.
+[2025-10-17 13:47:29,490] INFO django.utils.autoreload: Watching for file changes with StatReloader
+[2025-10-17 13:47:42,932] INFO django.utils.autoreload: D:\JHKdoc\CaseAI\myapp\views\evaluation.py changed, reloading.
+[2025-10-17 13:47:44,540] INFO django.utils.autoreload: Watching for file changes with StatReloader
+[2025-10-17 13:48:19,767] INFO django.utils.autoreload: D:\JHKdoc\CaseAI\myapp\views\dataset.py changed, reloading.
+[2025-10-17 13:48:22,093] INFO django.utils.autoreload: Watching for file changes with StatReloader
+[2025-10-17 13:48:51,787] INFO django.server: "GET / HTTP/1.1" 200 25786
+[2025-10-17 13:48:51,788] INFO django.server: "GET / HTTP/1.1" 200 3999
+[2025-10-17 13:48:54,954] INFO django.server: "GET /datasets/run/ HTTP/1.1" 200 41525
+[2025-10-17 13:48:54,954] INFO django.server: "GET /datasets/run/ HTTP/1.1" 200 8136
+[2025-10-17 13:48:55,189] INFO django.server: "GET /datasets/create/ HTTP/1.1" 200 22537
+[2025-10-17 13:48:55,190] INFO django.server: "GET /datasets/create/ HTTP/1.1" 200 5611
+[2025-10-17 13:48:56,529] INFO django.server: "GET /datasets/run/ HTTP/1.1" 200 8158
+[2025-10-17 13:48:56,551] INFO django.server: "GET /datasets/run/ HTTP/1.1" 200 41525
+[2025-10-17 13:48:57,201] INFO django.server: "GET /datasets/ HTTP/1.1" 200 4946
+[2025-10-17 13:48:57,201] INFO django.server: "GET /datasets/ HTTP/1.1" 200 23897
+[2025-10-17 13:48:59,118] INFO myapp.views.dataset: delete_dataset called for id=16 by 127.0.0.1
+[2025-10-17 13:48:59,187] INFO myapp.views.dataset: Deleted corpora for EvaluationSet id=16: (844, {'myapp.Corpus': 844})
+[2025-10-17 13:48:59,190] INFO myapp.views.dataset: Deleted EvaluationSet id=16 name="demo234"
+[2025-10-17 13:48:59,320] INFO django.server: "POST /datasets/delete/16/ HTTP/1.1" 200 149
+[2025-10-17 13:49:01,731] INFO django.server: "GET /datasets/ HTTP/1.1" 200 4949
+[2025-10-17 13:50:30,655] INFO django.utils.autoreload: D:\JHKdoc\CaseAI\myapp\views\dataset.py changed, reloading.
+[2025-10-17 13:50:33,077] INFO django.utils.autoreload: Watching for file changes with StatReloader
+[2025-10-17 13:50:58,976] INFO django.utils.autoreload: D:\JHKdoc\CaseAI\myapp\views\dataset.py changed, reloading.
+[2025-10-17 13:51:00,279] INFO django.utils.autoreload: Watching for file changes with StatReloader
+[2025-10-17 13:59:34,982] INFO django.utils.autoreload: D:\JHKdoc\CaseAI\myapp\views\dataset.py changed, reloading.
+[2025-10-17 13:59:37,612] INFO django.utils.autoreload: Watching for file changes with StatReloader
+[2025-10-17 14:00:06,816] INFO django.server: "GET / HTTP/1.1" 200 4047
+[2025-10-17 14:00:06,827] INFO django.server: "GET / HTTP/1.1" 200 25136
+[2025-10-17 14:00:10,086] INFO django.server: "GET /datasets/run/ HTTP/1.1" 200 8074
+[2025-10-17 14:00:10,100] INFO django.server: "GET /datasets/run/ HTTP/1.1" 200 40262
+[2025-10-17 14:00:36,098] INFO myapp.views.evaluation: Starting process_dataset_async run_id=73 evaluation_set_id=6
+[2025-10-17 14:00:36,204] INFO myapp.views.evaluation: Starting process_dataset_async run_id=74 evaluation_set_id=7
+[2025-10-17 14:00:36,205] INFO django.server: "POST /run_evaluation/ HTTP/1.1" 200 108
+[2025-10-17 14:00:36,219] INFO django.server: "GET /evaluation/status/?run_id=74 HTTP/1.1" 200 194
+[2025-10-17 14:00:36,220] INFO django.server: "GET /evaluation/status/?run_id=73 HTTP/1.1" 200 103
+[2025-10-17 14:00:36,316] INFO myapp.views.evaluation: AI agent info for run_id=74: {'name': '迭代5_热线1.5.2.0_测试', 'description': '迭代5_热线1.5.2.0_测试'}
+[2025-10-17 14:00:36,404] INFO myapp.views.evaluation: AI agent info for run_id=73: {'name': '迭代5_热线1.5.2.0_测试', 'description': '迭代5_热线1.5.2.0_测试'}
+[2025-10-17 14:00:37,233] INFO django.server: "GET /evaluation/status/?run_id=73 HTTP/1.1" 200 180
+[2025-10-17 14:00:37,233] INFO django.server: "GET /evaluation/status/?run_id=74 HTTP/1.1" 200 205
+[2025-10-17 14:00:38,249] INFO django.server: "GET /evaluation/status/?run_id=73 HTTP/1.1" 200 205
+[2025-10-17 14:00:38,250] INFO django.server: "GET /evaluation/status/?run_id=74 HTTP/1.1" 200 168
+[2025-10-17 14:00:39,266] INFO django.server: "GET /evaluation/status/?run_id=74 HTTP/1.1" 200 205
+[2025-10-17 14:00:39,266] INFO django.server: "GET /evaluation/status/?run_id=73 HTTP/1.1" 200 205
+[2025-10-17 14:00:40,272] INFO django.server: "GET /evaluation/status/?run_id=74 HTTP/1.1" 200 182
+[2025-10-17 14:00:40,272] INFO django.server: "GET /evaluation/status/?run_id=73 HTTP/1.1" 200 202
+[2025-10-17 14:00:41,285] INFO django.server: "GET /evaluation/status/?run_id=73 HTTP/1.1" 200 205
+[2025-10-17 14:00:41,285] INFO django.server: "GET /evaluation/status/?run_id=74 HTTP/1.1" 200 186
+[2025-10-17 14:00:42,301] INFO django.server: "GET /evaluation/status/?run_id=73 HTTP/1.1" 200 205
+[2025-10-17 14:00:42,303] INFO django.server: "GET /evaluation/status/?run_id=74 HTTP/1.1" 200 205
+[2025-10-17 14:00:43,319] INFO django.server: "GET /evaluation/status/?run_id=73 HTTP/1.1" 200 175
+[2025-10-17 14:00:43,319] INFO django.server: "GET /evaluation/status/?run_id=74 HTTP/1.1" 200 205
+[2025-10-17 14:00:44,195] INFO myapp.views.evaluation: Completed process_dataset_async run_id=73 processed=1
+[2025-10-17 14:00:44,336] INFO django.server: "GET /evaluation/status/?run_id=74 HTTP/1.1" 200 200
+[2025-10-17 14:00:44,336] INFO django.server: "GET /evaluation/status/?run_id=73 HTTP/1.1" 200 710
+[2025-10-17 14:00:44,724] INFO myapp.views.evaluation: Completed process_dataset_async run_id=74 processed=1
+[2025-10-17 14:00:45,375] INFO django.server: "GET /evaluation/status/?run_id=73 HTTP/1.1" 200 724
+[2025-10-17 14:00:45,375] INFO django.server: "GET /evaluation/status/?run_id=74 HTTP/1.1" 200 726
+[2025-10-17 14:03:08,166] INFO django.server: "GET /api/datasets HTTP/1.1" 301 0
+[2025-10-17 14:03:08,166] INFO django.server: "GET /api/datasets HTTP/1.1" 301 0
+[2025-10-17 14:03:08,179] INFO django.server: "GET /api/datasets/ HTTP/1.1" 200 564
+[2025-10-17 14:03:08,194] INFO django.server: "GET /api/datasets/ HTTP/1.1" 200 301
+[2025-10-17 14:03:08,207] INFO django.server: "GET /api/datasets/ HTTP/1.1" 200 564
+[2025-10-17 14:05:58,158] INFO django.utils.autoreload: D:\JHKdoc\CaseAI\myapp\views\dataset.py changed, reloading.
+[2025-10-17 14:06:02,431] INFO django.utils.autoreload: Watching for file changes with StatReloader
+[2025-10-17 14:06:10,911] INFO django.utils.autoreload: D:\JHKdoc\CaseAI\myapp\views\dataset.py changed, reloading.
+[2025-10-17 14:06:11,657] INFO django.utils.autoreload: Watching for file changes with StatReloader
+[2025-10-17 14:12:01,924] INFO django.utils.autoreload: D:\JHKdoc\CaseAI\myapp\views\dataset.py changed, reloading.
+[2025-10-17 14:12:07,519] INFO django.utils.autoreload: Watching for file changes with StatReloader
+[2025-10-17 14:22:48,691] INFO django.utils.autoreload: D:\JHKdoc\CaseAI\myapp\urls.py changed, reloading.
+[2025-10-17 14:22:52,002] INFO django.utils.autoreload: Watching for file changes with StatReloader
+[2025-10-17 14:24:09,668] INFO django.utils.autoreload: D:\JHKdoc\CaseAI\myapp\urls.py changed, reloading.
+[2025-10-17 14:24:11,164] INFO django.utils.autoreload: Watching for file changes with StatReloader
+[2025-10-17 14:24:24,218] INFO django.utils.autoreload: D:\JHKdoc\CaseAI\myapp\urls.py changed, reloading.
+[2025-10-17 14:24:25,525] INFO django.utils.autoreload: Watching for file changes with StatReloader
+[2025-10-17 14:24:31,129] INFO django.server: "GET / HTTP/1.1" 200 25129
+[2025-10-17 14:24:31,130] INFO django.server: "GET / HTTP/1.1" 200 4057
+[2025-10-17 14:24:34,092] INFO django.server: "GET /datasets/create/ HTTP/1.1" 200 22537
+[2025-10-17 14:24:34,093] INFO django.server: "GET /datasets/create/ HTTP/1.1" 200 5593
+[2025-10-17 14:24:35,228] INFO django.server: "GET /datasets/run/ HTTP/1.1" 200 8112
+[2025-10-17 14:24:35,237] INFO django.server: "GET /datasets/run/ HTTP/1.1" 200 40262
