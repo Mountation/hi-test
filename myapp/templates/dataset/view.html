@@ -1,0 +1,176 @@
+<!-- myapp/templates/dataset/view.html -->
+{% extends 'base.html' %}
+
+{% block title %}AI评测系统 - 查看评测集{% endblock %}
+
+{% block content %}
+<!-- 查看评测集详情页面 -->
+<div id="view-dataset-content">
+    <div class="header">
+        <h1><i class="bi bi-collection me-3"></i>查看评测集</h1>
+        <p class="mb-0">评测集详情及语料内容</p>
+    </div>
+    
+    <!-- 评测集基本信息 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>评测集信息</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 fw-bold">评测集名称:</dt>
+                        <dd class="col-sm-8">{{ evaluation_set.name }}</dd>
+                        
+                        <dt class="col-sm-4 fw-bold">创建时间:</dt>
+                        <dd class="col-sm-8">{{ evaluation_set.created_at|date:"Y-m-d H:i:s" }}</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 fw-bold">语料总数:</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-primary">{{ corpora_count }}</span>
+                        </dd>
+                        
+                        <dt class="col-sm-4 fw-bold">状态:</dt>
+                        <dd class="col-sm-8">
+                            {% if evaluation_set.status == 'active' %}
+                                <span class="badge bg-success">活跃</span>
+                            {% else %}
+                                <span class="badge bg-secondary">非活跃</span>
+                            {% endif %}
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+            
+            {% if evaluation_set.description %}
+            <div class="mt-3">
+                <h6 class="fw-bold mb-2">描述:</h6>
+                <div class="border rounded p-3 bg-light">
+                    {{ evaluation_set.description }}
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="mt-4 d-flex gap-2">
+                <a href="{% url 'list_datasets' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>返回评测集列表
+                </a>
+                <a href="{% url 'create_dataset' %}" class="btn btn-success">
+                    <i class="bi bi-plus-circle me-1"></i>创建新评测集
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 语料列表 -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-file-text me-2"></i>语料列表</h5>
+            <span class="badge bg-primary">{{ corpora_count }} 条语料</span>
+        </div>
+        <div class="card-body">
+            {% if corpora %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 5%;">序号</th>
+                            <th style="width: 30%;">语料内容</th>
+                            <th style="width: 25%;">预期响应</th>
+                            <th style="width: 15%;">意图</th>
+                            <th style="width: 10%;">创建时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for corpus in corpora %}
+                        <tr class="align-middle">
+                            <td class="fw-bold">{{ start_index|add:forloop.counter0 }}</td>
+                            <td>
+                                <div class="text-pre-wrap">{{ corpus.content }}</div>
+                            </td>
+                            <td>
+                                {% if corpus.expected_response %}
+                                    <div class="text-pre-wrap text-muted">{{ corpus.expected_response }}</div>
+                                {% else %}
+                                    <span class="text-muted fst-italic">无预期响应</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if corpus.intent %}
+                                    <span class="badge bg-info">{{ corpus.intent }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">未指定</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small class="text-muted">{{ corpus.created_at|date:"Y-m-d" }}</small>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+                <!-- 分页控件 -->
+                <nav aria-label="Corpus pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link" aria-hidden="true">&laquo;</span>
+                            </li>
+                        {% endif %}
+
+                        {# 显示最多 7 个页码（当前页前后各3个） #}
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num >= page_obj.number|add:-3 and num <= page_obj.number|add:3 %}
+                                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link" aria-hidden="true">&raquo;</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox fs-1 text-muted mb-3"></i>
+                <h5 class="text-muted">该评测集暂无语料内容</h5>
+                <p class="text-muted mb-0">请先添加语料数据</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+    .text-pre-wrap {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+</style>
+<script>
+// 可以在这里添加额外的JavaScript功能
+</script>
+{% endblock %}

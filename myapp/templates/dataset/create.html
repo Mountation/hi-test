@@ -1,0 +1,242 @@
+<!-- myapp/templates/dataset/create.html -->
+{% extends 'base.html' %}
+
+{% block title %}AI评测系统 - 创建评测集{% endblock %}
+
+{% block content %}
+<!-- 创建评测集页面 -->
+<div id="create-dataset-content">
+    <div class="header">
+        <h1><i class="bi bi-plus-circle me-3"></i>创建评测集</h1>
+        <p class="mb-0">上传Excel文件创建新的评测集</p>
+    </div>
+    
+    <div class="card mb-4 requirement-card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>评测集要求</h5>
+        </div>
+        <div class="card-body">
+            <ul>
+                <li>上传的文件必须是Excel格式（.xlsx 或 .xls）</li>
+                <li>Excel文件第一行为标题行</li>
+                <li>第一列必须包含语料内容（必填）</li>
+                <li>第二列（可选）可以包含预期响应</li>
+                <li>第三列及以后的列将作为附加信息保存</li>
+                <li>确保评测集名称唯一</li>
+            </ul>
+            <p><strong>示例格式：</strong></p>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>语料内容</th>
+                        <th>预期响应</th>
+                        <th>其他信息</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>如何重置电视机密码？</td>
+                        <td>您可以通过按住遥控器上的重置按钮5秒钟来重置电视机密码。</td>
+                        <td>电视机相关</td>
+                    </tr>
+                    <tr>
+                        <td>冰箱不制冷怎么办？</td>
+                        <td>请检查电源是否连接，以及温控设置是否正确。</td>
+                        <td>冰箱相关</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- 创建评测集表单 -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-file-earmark-spreadsheet me-2"></i>上传Excel文件</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data" id="create-dataset-form">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="evaluation_set_name" class="form-label">评测集名称 *</label>
+                    <input type="text" class="form-control" id="evaluation_set_name" name="evaluation_set_name" 
+                           placeholder="请输入评测集名称" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="evaluation_set_desc" class="form-label">评测集描述</label>
+                    <textarea class="form-control" id="evaluation_set_desc" name="evaluation_set_desc" rows="3"
+                              placeholder="请输入评测集描述"></textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="excel_file" class="form-label">上传Excel文件 *</label>
+                    <input type="file" class="form-control" id="excel_file" name="excel_file" 
+                           accept=".xlsx,.xls" required>
+                    <div class="form-text">请选择包含评测数据的Excel文件</div>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-upload me-1"></i>创建评测集
+                    </button>
+                    <a href="{% url 'list_datasets' %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>返回现有评测集
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 上传进度条 -->
+    <div class="card mt-3" id="upload-progress-card" style="display:none;">
+        <div class="card-body">
+            <h6>上传进度</h6>
+            <div class="progress">
+                <div id="upload-progress-bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+            </div>
+            <div id="upload-progress-text" class="mt-2 small text-muted">准备上传...</div>
+        </div>
+    </div>
+
+    <!-- 创建结果消息提示 -->
+    <div id="create-result-messages"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 创建评测集表单提交处理（使用 XMLHttpRequest 以显示上传进度）
+    document.getElementById('create-dataset-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const form = this;
+        const fileInput = document.getElementById('excel_file');
+        const nameInput = document.getElementById('evaluation_set_name');
+        const messagesContainer = document.getElementById('create-result-messages');
+
+        // 清空之前的消息
+        messagesContainer.innerHTML = '';
+
+        // 基本验证
+        if (!nameInput.value.trim()) {
+            showMessage('请输入评测集名称', 'danger');
+            return;
+        }
+
+        if (fileInput.files.length === 0) {
+            showMessage('请选择要上传的Excel文件', 'danger');
+            return;
+        }
+
+        // 检查文件类型
+        const fileName = fileInput.files[0].name.toLowerCase();
+        if (!fileName.endsWith('.xlsx') && !fileName.endsWith('.xls')) {
+            showMessage('请选择Excel文件 (.xlsx 或 .xls)', 'danger');
+            return;
+        }
+
+        // 创建FormData对象
+        const formData = new FormData(form);
+
+        // 显示上传进度 UI
+        const progressCard = document.getElementById('upload-progress-card');
+        const progressBar = document.getElementById('upload-progress-bar');
+        const progressText = document.getElementById('upload-progress-text');
+        progressCard.style.display = '';
+        progressBar.style.width = '0%';
+        progressBar.setAttribute('aria-valuenow', 0);
+        progressBar.textContent = '0%';
+        progressText.textContent = '准备上传...';
+
+        showMessage('正在上传文件，请稍候...', 'info', true);
+
+        // 使用 XMLHttpRequest 以监听上传进度
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '{% url "create_dataset" %}', true);
+
+        // CSRF
+        xhr.setRequestHeader('X-CSRFToken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+        // 上传进度事件
+        xhr.upload.onprogress = function(event) {
+            if (event.lengthComputable) {
+                const percent = Math.round((event.loaded / event.total) * 100);
+                progressBar.style.width = percent + '%';
+                progressBar.setAttribute('aria-valuenow', percent);
+                progressBar.textContent = percent + '%';
+                progressText.textContent = `已上传 ${percent}%`;
+            } else {
+                progressText.textContent = '已上传部分数据...';
+            }
+        };
+
+        // 完成/成功
+        xhr.onload = function() {
+            // 隐藏 spinner 信息
+            // 读取响应并处理
+            let resp = {};
+            try {
+                resp = JSON.parse(xhr.responseText || '{}');
+            } catch (e) {
+                console.error('Invalid JSON response', e);
+                showMessage('服务器返回无效响应', 'danger');
+                return;
+            }
+
+            if (xhr.status >= 200 && xhr.status < 300 && resp.status === 'success') {
+                progressBar.style.width = '100%';
+                progressBar.setAttribute('aria-valuenow', 100);
+                progressBar.textContent = '100%';
+                progressText.textContent = '上传完成，正在处理...';
+
+                showMessage(resp.message, 'success');
+                form.reset();
+
+                setTimeout(() => {
+                    window.location.href = '{% url "list_datasets" %}';
+                }, 3000);
+            } else {
+                const msg = resp.message || `上传失败（状态 ${xhr.status}）`;
+                showMessage(msg, 'danger');
+                progressText.textContent = '上传失败';
+            }
+        };
+
+        xhr.onerror = function() {
+            showMessage('上传过程中发生错误，请重试', 'danger');
+            progressText.textContent = '上传出错';
+        };
+
+        xhr.send(formData);
+    });
+    
+    function showMessage(message, type, loading = false) {
+        const messagesContainer = document.getElementById('create-result-messages');
+        messagesContainer.innerHTML = '';
+        
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        
+        if (loading) {
+            alertDiv.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <div class="spinner-border spinner-border-sm me-2" role="status">
+                        <span class="visually-hidden">处理中...</span>
+                    </div>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+        } else {
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+        }
+        
+        messagesContainer.appendChild(alertDiv);
+    }
+</script>
+{% endblock %}

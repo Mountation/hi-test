@@ -1,0 +1,160 @@
+<!-- myapp/templates/home/index.html -->
+{% extends 'base.html' %}
+
+{% block title %}AI评测系统 - 概述{% endblock %}
+
+{% block content %}
+<!-- 概述页面 -->
+<div id="overview-content">
+    <div class="header">
+        <h1><i class="bi bi-speedometer2 me-3"></i>评测概述</h1>
+        <p class="mb-0">系统整体运行状态和评测数据概览</p>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-number">{{ evaluation_sets_count }}</div>
+                <div class="stat-label">评测集数量</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-number">{{ total_corpora }}</div>
+                <div class="stat-label">语料总数</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-number">{{ recent_runs|length }}</div>
+                <div class="stat-label">近期运行</div>
+            </div>
+        </div>
+    </div>
+    
+    <h3 class="section-title">评测集概览</h3>
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>评测集名称</th>
+                            <th>语料数量</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>最近运行版本</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for eval_set in evaluation_sets %}
+                        <tr>
+                            <td>{{ eval_set.name }}</td>
+                            <td>{{ eval_set.corpora_count }}</td>
+                            <td>
+                                {% if eval_set.status == 'active' %}
+                                    <span class="badge bg-success">活跃</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">非活跃</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ eval_set.created_at|date:"Y-m-d H:i" }}</td>
+                            <td>
+                                {% if eval_set.latest_run %}
+                                    <span class="badge bg-info">{{ eval_set.latest_run.version }}</span>
+                                    {% if eval_set.latest_run.status == 'success' %}
+                                        <span class="badge bg-success ms-1">成功</span>
+                                    {% elif eval_set.latest_run.status == 'failed' %}
+                                        <span class="badge bg-danger ms-1">失败</span>
+                                    {% else %}
+                                        <span class="badge bg-warning ms-1">运行中</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">未运行</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <h3 class="section-title">历史评测记录</h3>
+    <div class="card">
+        <div class="card-body">
+            {% if recent_runs %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>评测集</th>
+                            <th>运行名称</th>
+                            <th>版本</th>
+                            <th>状态</th>
+                            <th>开始时间</th>
+                            <th>耗时(秒)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for run in recent_runs %}
+                        <tr>
+                            <td>{{ run.evaluation_set.name }}</td>
+                            <td>{{ run.run_name }}</td>
+                            <td>{{ run.version }}</td>
+                            <td>
+                                {% if run.status == 'success' %}
+                                    <span class="badge bg-success">成功</span>
+                                {% elif run.status == 'failed' %}
+                                    <span class="badge bg-danger">失败</span>
+                                {% else %}
+                                    <span class="badge bg-warning">运行中</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ run.start_time|date:"Y-m-d H:i:s" }}</td>
+                            <td>{{ run.duration|default:"-" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                <p>暂无历史评测记录</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 显示消息
+    document.addEventListener('DOMContentLoaded', function() {
+        const messagesData = JSON.parse("{{ messages_data|escapejs }}");
+        if (messagesData.length > 0) {
+            const alertContainer = document.createElement('div');
+            alertContainer.className = 'container mt-3';
+            
+            messagesData.forEach(function(message) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${message.tags} alert-dismissible fade show`;
+                alertDiv.innerHTML = `
+                    ${message.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                alertContainer.appendChild(alertDiv);
+            });
+            
+            // 将消息插入到页面顶部
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent && mainContent.firstChild) {
+                mainContent.insertBefore(alertContainer, mainContent.firstChild);
+            }
+        }
+    });
+</script>
+{% endblock %}

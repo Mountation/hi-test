@@ -1,0 +1,81 @@
+<!-- myapp/templates/evaluation/results.html -->
+{% extends 'base.html' %}
+
+{% block title %}AI评测系统 - 评测结果{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">数据库评测结果</h1>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-4">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    {% if data %}
+        <div class="mb-3">
+            <a href="{% url 'list_datasets' %}" class="btn btn-primary">返回数据库评测页面</a>
+            <button onclick="exportToExcel()" class="btn btn-success">导出为Excel</button>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-striped table-hover" id="resultTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>语料内容</th>
+                        <th>预期响应</th>
+                        <th>实际响应</th>
+                        <th>评分</th>
+                        <th>语料类型</th>
+                        <th>创建时间</th>
+                        <th>版本</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                        <tr>
+                            <td style="white-space: pre-wrap; word-wrap: break-word;">{{ row.content }}</td>
+                            <td style="white-space: pre-wrap; word-wrap: break-word;">{{ row.expected_response }}</td>
+                            <td style="white-space: pre-wrap; word-wrap: break-word;">{{ row.actual_response }}</td>
+                            <td>{{ row.score }}</td>
+                            <td>{{ row.corpus_type }}</td>
+                            <td>{{ row.created_at }}</td>
+                            <td>{{ row.version }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <p>暂无数据可显示。</p>
+            <a href="{% url 'list_datasets' %}" class="btn btn-primary">返回数据库评测页面</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function exportToExcel() {
+        // 创建工作簿
+        var wb = XLSX.utils.book_new();
+        
+        // 获取表格数据
+        var table = document.getElementById('resultTable');
+        var ws = XLSX.utils.table_to_sheet(table, {sheet:"Sheet1"});
+        
+        // 添加工作表到工作簿
+        XLSX.utils.book_append_sheet(wb, ws, "评测结果");
+        
+        // 导出文件
+        XLSX.writeFile(wb, "数据库评测结果.xlsx");
+    }
+</script>
+
+<!-- 添加 SheetJS 库用于Excel导出 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+{% endblock %}
