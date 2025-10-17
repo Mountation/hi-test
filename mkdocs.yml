@@ -1,0 +1,26 @@
+site_name: CaseAI 文档
+site_description: CaseAI 项目文档（中文）
+site_author: CaseAI 团队
+repo_url: ''
+
+theme:
+  name: material
+  language: zh
+
+nav:
+  - 首页: index.md
+  - 架构: ARCHITECTURE.md
+  - 快速开始:
+    - 本地启动: ../README.md
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.highlight
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: ''

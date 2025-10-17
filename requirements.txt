@@ -7,3 +7,5 @@ psycopg2-binary>=2.9   # If using PostgreSQL in production
 # Optional / development
 ipython
 pytest
+mkdocs>=1.5
+mkdocs-material>=9.0

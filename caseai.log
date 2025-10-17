@@ -96,3 +96,24 @@
 [2025-10-17 14:24:34,093] INFO django.server: "GET /datasets/create/ HTTP/1.1" 200 5593
 [2025-10-17 14:24:35,228] INFO django.server: "GET /datasets/run/ HTTP/1.1" 200 8112
 [2025-10-17 14:24:35,237] INFO django.server: "GET /datasets/run/ HTTP/1.1" 200 40262
+[2025-10-17 14:29:13,847] INFO django.utils.autoreload: D:\JHKdoc\CaseAI\myapp\urls.py changed, reloading.
+[2025-10-17 14:29:17,663] INFO django.utils.autoreload: Watching for file changes with StatReloader
+[2025-10-17 14:33:53,952] INFO django.server: "GET /datasets/create/ HTTP/1.1" 200 5524
+[2025-10-17 14:33:53,952] INFO django.server: "GET /datasets/create/ HTTP/1.1" 200 22537
+[2025-10-17 14:33:55,972] INFO django.server: "GET /datasets/ HTTP/1.1" 200 23045
+[2025-10-17 14:33:55,974] INFO django.server: "GET /datasets/ HTTP/1.1" 200 4913
+[2025-10-17 14:33:56,744] INFO django.server: "GET /datasets/run/ HTTP/1.1" 200 40262
+[2025-10-17 14:33:56,744] INFO django.server: "GET /datasets/run/ HTTP/1.1" 200 8081
+[2025-10-17 14:33:57,206] INFO django.server: "GET /datasets/create/ HTTP/1.1" 200 22537
+[2025-10-17 14:33:57,206] INFO django.server: "GET /datasets/create/ HTTP/1.1" 200 5531
+[2025-10-17 14:33:57,615] INFO django.server: "GET /datasets/create/ HTTP/1.1" 200 5517
+[2025-10-17 14:33:58,011] INFO django.server: "GET /datasets/ HTTP/1.1" 200 4915
+[2025-10-17 14:33:58,051] INFO django.server: "GET /datasets/ HTTP/1.1" 200 23045
+[2025-10-17 14:36:40,061] INFO django.server: "GET /datasets/create/ HTTP/1.1" 200 5527
+[2025-10-17 14:36:40,064] INFO django.server: "GET /datasets/create/ HTTP/1.1" 200 22537
+[2025-10-17 14:36:40,616] INFO django.server: "GET /datasets/run/ HTTP/1.1" 200 8131
+[2025-10-17 14:36:40,643] INFO django.server: "GET /datasets/run/ HTTP/1.1" 200 40262
+[2025-10-17 14:36:43,038] INFO django.server: "GET /datasets/ HTTP/1.1" 200 4956
+[2025-10-17 14:36:43,044] INFO django.server: "GET /datasets/ HTTP/1.1" 200 23045
+[2025-10-17 14:36:45,898] INFO django.server: "GET / HTTP/1.1" 200 25129
+[2025-10-17 14:36:45,899] INFO django.server: "GET / HTTP/1.1" 200 4006

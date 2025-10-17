@@ -14,5 +14,4 @@ urlpatterns = [
     path('datasets/run/', run_dataset_page, name='run_dataset_page'),
     path('evaluation/status/', check_processing_status, name='check_processing_status'),
     path('evaluation/cancel/', cancel_processing, name='cancel_processing'),
-    # (API routes removed) frontend uses page views under /datasets/ instead
 ]

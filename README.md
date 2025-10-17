@@ -1,6 +1,14 @@
-# CaseAI
+# CaseAI 🚀
 
-CaseAI 是一个基于 Django 的 AI 评测系统，允许用户通过上传 Excel 文件创建评测集（EvaluationSet），存储语料（Corpus），并对模型进行评测与结果导出。该项目包含前端 UI（Bootstrap）、文件上传与解析、批量数据写入、评测执行与结果管理。
+![CaseAI architecture](docs/assets/architecture.svg)
+
+![Build](https://img.shields.io/badge/build-passing-brightgreen)
+![Python](https://img.shields.io/badge/python-3.8%2B-blue)
+![Django](https://img.shields.io/badge/django-supported-success)
+
+CaseAI 是一个基于 Django 的 AI 评测系统，允许用户通过上传 Excel 文件创建评测集（EvaluationSet）、存储语料（Corpus），并对模型进行评测与结果导出。✨
+
+更多架构细节请参阅 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) 📚
 
 ## 主要功能
 
@@ -26,8 +34,6 @@ CaseAI 是一个基于 Django 的 AI 评测系统，允许用户通过上传 Exc
   - `views/evaluation.py` - 评测执行流程
 
 ## 已做的重要优化
-
-1. 导入性能
    - 使用 `openpyxl` 的 `read_only=True` 模式按行流式解析 Excel，避免一次性加载整个文件到内存。
    - 使用 Django 的 `bulk_create`（按批次，例如 1000 条/批）批量写入 `Corpus`，大幅减少数据库插入次数与延迟。
    - 批量插入包裹在 `transaction.atomic()` 中以保证一致性。
@@ -45,6 +51,44 @@ CaseAI 是一个基于 Django 的 AI 评测系统，允许用户通过上传 Exc
 
 推荐在虚拟环境中运行（venv / conda）。项目主要依赖：
 
+## 技术栈
+
+项目主要使用以下技术与库：
+
+- 语言与运行时
+   - Python 3.8+（项目在开发环境中使用 3.13，但向后兼容较旧 Python 版本）。
+
+- Web 框架
+   - Django：负责路由、视图、模板与 ORM（主要业务逻辑与页面均基于 Django 实现）。
+
+- Excel 解析
+   - openpyxl：使用 `read_only=True` 的流式解析来处理大型 `.xlsx` 文件，避免一次性全量加载。
+
+- 数据库
+   - 开发/默认：SQLite（`db.sqlite3`，便于本地开发与快速试验）。
+   - 生产建议：PostgreSQL（更好的并发、事务与扩展能力，适合大数据量场景）。
+
+- 前端
+   - Bootstrap（用于基础布局与样式）。
+   - 原生 JS（XHR / fetch）用于文件上传进度显示和部分 AJAX 操作。
+
+- 批量/性能优化
+   - 使用 Django ORM 的 `bulk_create`（分批）与 `transaction.atomic()` 来提高导入性能并保证一致性。
+
+- 部署建议
+   - WSGI：Gunicorn（Linux）或 Waitress（Windows）用于生产运行。
+   - 反向代理/静态：Nginx + Whitenoise（或仅 Nginx 指向 collectstatic 产物）。
+
+- 可选组件（按需添加）
+   - 后台任务：Celery + Redis（将长耗时的导入/评测任务移到异步队列，前端仅轮询/查询进度）。
+   - 监控/指标：Prometheus、StatsD（Datadog）或 ELK/EFK 日志收集（将性能与日志导出到监控系统）。
+
+- 其他库（示例）
+   - psycopg2-binary（Postgres 驱动，可在 requirements.txt 中列出），
+   - whitenoise（静态文件支持），
+   - pytest / ipython（开发/测试辅助）。
+
+在 README 的其他章节已对部署与日志/性能监控给出更详细说明（如需要，我可以把技术栈内容同步到 README 头部或生成一页单独的 ARCHITECTURE.md）。
 - Python 3.8+（项目环境中为 3.13）
 - Django 版本（请查看 `CaseAI/settings.py` 中 `INSTALLED_APPS`）
 - openpyxl
